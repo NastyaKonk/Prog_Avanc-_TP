@@ -16,6 +16,13 @@ Si l'image de départ avait un canal alpha, la methode .to_rgb8(). aurait totale
 De plus les pixels transparent seront opaque. 
 
 
+Question 4 : 
+
+Pour cela on utilise la fonction get_pixel comme ci-dessous : 
+
+![alt text](./Question4.png)
+
+
 Question 5 : 
 
 L'image reste tout de même reconaissable même si les details ne sont plus du tout net.
@@ -89,4 +96,10 @@ Donc on a choisi d'utiliser toute les couleurs de notre palette pour ne pas avoi
 
 PARTIE 4 : 
 
-Question 12 : 
+![alt text](./Question12.png)
+
+Dans un tramage aléatoire, pour chaque pixel de l’image, on tire au hasard un seuil entre 0 et 1, et on met le pixel en blanc si sa luminosité est supérieure au seuil.
+
+PARTIE 7 : 
+
+Question 21 : 

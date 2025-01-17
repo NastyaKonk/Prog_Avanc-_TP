@@ -5,6 +5,7 @@ use argh::FromArgs;
 use image::ImageBuffer;
 use image::{Rgb, RgbImage};
 use image::Pixel;
+use rand::Rng;
 
 #[derive(Debug, Clone, PartialEq, FromArgs)]
 /// Convertit une image en monochrome ou vers une palette réduite de couleurs.
@@ -28,6 +29,8 @@ struct DitherArgs {
 enum Mode {
     Seuil(OptsSeuil),
     Palette(OptsPalette),
+    Dithering(OptsDithering),
+    Brouillard(OptsBrouillard)
 }
 
 #[derive(Debug, Clone, PartialEq, FromArgs)]
@@ -44,7 +47,20 @@ struct OptsSeuil {
     light_color: String,
 }
 
+#[derive(Debug, Clone, PartialEq, FromArgs)]
+#[argh(subcommand, name="Dithering")]
+///Rendu du dithering sur l'image
+struct OptsDithering {
+}
 
+#[derive(Debug, Clone, PartialEq, FromArgs)]
+#[argh(subcommand, name="Brouillard")]
+///Rendu de l'mage quand on passe un pixel sur deux en blanc
+struct OptsBrouillard {
+
+
+   
+}
 #[derive(Debug, Clone, PartialEq, FromArgs)]
 #[argh(subcommand, name="palette")]
 /// Rendu de l’image avec une palette contenant un nombre limité de couleurs
@@ -120,17 +136,12 @@ fn main() -> Result<(), ImageError>{
     let path_out = args.output.unwrap_or_else(|| "output.png".to_string());
     
 
-    //1
+    
     let img_file = ImageReader::open(path_in)?;
     let mut img = img_file.decode()?.into_rgb8();
-    /* println!("Le pixel en 32, 52 a pour couleur {:?}", img.get_pixel(32, 52));
-    for (x, y, color) in img.enumerate_pixels_mut(){
-        if (x+y) % 2  == 0{
-            *color = Rgb([255,255,255])
-        }
-    }
-    img.save("out1.png")?; */
- 
+    println!("Le pixel en 32, 52 a pour couleur {:?}", img.get_pixel(32, 52));
+  
+   
     match args.mode {
         Mode::Seuil(opts) => {
             for (_x, _y, pixel) in img.enumerate_pixels_mut() {
@@ -162,6 +173,36 @@ fn main() -> Result<(), ImageError>{
             for (_x, _y, pixel) in img.enumerate_pixels_mut() {
                 *pixel = find_closest_color(pixel, &palette);
             }
+        }
+
+        Mode::Dithering(opts) => {
+    
+
+            for (_x, _y, pixel) in img.enumerate_pixels_mut() {
+                // Calculer la luminosité du pixel
+                let Luma(luminosity) = pixel.to_luma();
+            
+                // Générer un seuil aléatoire entre 0 et 255
+                let random_threshold: f32 = rand::thread_rng().gen_range(0.0..1.0);
+            
+                // Comparer la luminosité normalisée au seuil
+                let new_pixel = if luminosity[0] as f32 / 255.0 > random_threshold {
+                    WHITE // Si luminosité supérieure au seuil, pixel blanc
+                } else {
+                    BLACK // Sinon, pixel noir
+                };
+            
+                *pixel = new_pixel;
+            }
+        }
+
+        Mode::Brouillard(opts) => {
+            for (x, y, color) in img.enumerate_pixels_mut(){
+                if (x+y) % 2  == 0{
+                    *color = Rgb([255,255,255])
+                }
+            }
+    
         }
     }
 
