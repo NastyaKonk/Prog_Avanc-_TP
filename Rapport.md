@@ -79,3 +79,13 @@ On fait ensuite la racine carré de tout cela grâce au (dr * dr + dg * dg + db 
 
 
 Question 11 : 
+
+Dans la variable default une variabkle numerique qui est 8, celle ci represente le nombre de couleur qui constitura note palette.
+Donc on a choisi d'utiliser toute les couleurs de notre palette pour ne pas avoir d'erreur.
+
+![alt text](./question11-1.png)
+![alt text](./question11.png)
+
+
+PARTIE 4 : 
+
