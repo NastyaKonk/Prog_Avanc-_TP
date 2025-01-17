@@ -7,6 +7,7 @@ use image::{Rgb, RgbImage};
 use image::Pixel;
 use rand::Rng;
 
+
 #[derive(Debug, Clone, PartialEq, FromArgs)]
 /// Convertit une image en monochrome ou vers une palette réduite de couleurs.
 struct DitherArgs {
@@ -205,6 +206,7 @@ fn main() -> Result<(), ImageError>{
     
         }
     }
+
 
     img.save(path_out)?;
     return Ok(()) 
