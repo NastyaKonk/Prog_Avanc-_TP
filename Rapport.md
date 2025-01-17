@@ -60,12 +60,22 @@ La commande pour mettre d'autre nuance de couleur
 
 '' $ cargo run -- image.jpg output.png seuil --dark-color jaune --light-color vert''
 
+
+
 PARTIE 3 : 
 
-Question 9 : 
+Question 9 - 10 : 
 
 Afin de calculer la distance entre deux couleurs, nous utilisons la fonction color_distance qui permet de calculer la distance entre deux couleur. 
-La methode de calucle utiliser est la distance euclidienne appliqué à notre espace RGB.
+La methode de calucle utiliser est donc la distance euclidienne appliqué à notre espace RGB.
+
+Ici on calcule séparément la différences des composantes RGB :
+
+![alt text](./question9-2.png)
+
+Une fois les différence cacluler nous les mettons au carrée et nous les additionons à l'aide de cette formule :
+dr * dr + dg * dg + db * db
+On fait ensuite la racine carré de tout cela grâce au (dr * dr + dg * dg + db * db).sqrt
 
 
-
+Question 11 : 
