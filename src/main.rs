@@ -70,7 +70,7 @@ fn default_number() -> usize {
 }
 
 fn default_noir() -> String {
-    "noire".to_string()
+    "noir".to_string()
 }
 
 fn default_blanc() -> String {
