@@ -96,6 +96,8 @@ Donc on a choisi d'utiliser toute les couleurs de notre palette pour ne pas avoi
 
 PARTIE 4 : 
 
+Question 12 : 
+
 ![alt text](./Question12.png)
 
 Dans un tramage aléatoire, pour chaque pixel de l’image, on tire au hasard un seuil entre 0 et 1, et on met le pixel en blanc si sa luminosité est supérieure au seuil.
@@ -103,3 +105,31 @@ Dans un tramage aléatoire, pour chaque pixel de l’image, on tire au hasard u
 PARTIE 7 : 
 
 Question 21 : 
+
+Voici ce que l'on obtient avec la commande '$ cargo run -- --help'
+![alt text](./Question21-1.png)
+
+Cependant pour afficher les arguments il faut effectuer la commande :
+
+'$ cargo run -- seuil --help'
+![alt text](./Question21.png)
+
+
+
+Question 22 : 
+
+Voici comment nous avons determiner le type Rust correspondant à une sélection d’options fournies par l’utilisateur.
+
+![alt text](./Question22.png)
+
+Question 23 : 
+
+On a implémenter dans le main  cette partie : 
+
+"let args: DitherArgs = argh::from_env();"
+
+qui sert à analyser et récupérer les arguments passés par l’utilisateur à travers la ligne de commande.
+Et on retrouve l'argument args initialisé dans le mode comme vous pouvez le voir ci-dessous. 
+
+![alt text](./Question23.png)
+
