@@ -38,3 +38,34 @@ Donc la luminosité d’un pixel est calculée avec pixel.to_luma(), cette fonct
 
 Question 8 : 
 
+La mode  seuil ne comprenait pas d'option qui permet à l'utilisateur de spécifier un type de couleur, foncé ou clair, ou de changer l'image en noir ou en blanc. 
+Nous avons donc creer ses options : 
+
+
+![alt text](./question8.png)
+
+Dans une variable default, nous avons mis du blanc et du noir comme demandé dans la question puis nous avons étendu cela à tous les panels de couleur grace au parse_color.
+
+
+
+'' $ cargo run -- image.jpg output.png seuil --dark-color noir --light-color blanc''
+
+Via la ligne de commande il suffit de spécifier "-dark-color" ou "-light-color" (dark oou light) 
+
+La commande pour mettre l'image en noir et blanc : 
+
+'' $ cargo run -- image.jpg output.png seuil --dark-color noir --light-color blanc''
+
+La commande pour mettre d'autre nuance de couleur
+
+'' $ cargo run -- image.jpg output.png seuil --dark-color jaune --light-color vert''
+
+PARTIE 3 : 
+
+Question 9 : 
+
+Afin de calculer la distance entre deux couleurs, nous utilisons la fonction color_distance qui permet de calculer la distance entre deux couleur. 
+La methode de calucle utiliser est la distance euclidienne appliqué à notre espace RGB.
+
+
+
