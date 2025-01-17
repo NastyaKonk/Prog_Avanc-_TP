@@ -89,3 +89,4 @@ Donc on a choisi d'utiliser toute les couleurs de notre palette pour ne pas avoi
 
 PARTIE 4 : 
 
+Question 12 : 
