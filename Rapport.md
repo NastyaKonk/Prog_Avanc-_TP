@@ -24,6 +24,17 @@ L'image reste tout de même reconaissable même si les details ne sont plus du t
                 Partie 2 : Passage en monochrome par seuillage
 
 
-Question 6 : 
+Question 6 et 7 : 
 
-Afin de récupérer la luminisité d'un pixel, 
+Afin de récupérer la luminisité d'un pixel, nous avons utilisé la méthode to_luma() qui est fournie dans la bibliothéque image.
+Cette methode permet de convertir un pixel de type Rgb <u8> en une valeur de luminosité qui est donc encapsulée dans un type Luma.
+
+
+![alt text](./question6.png)
+
+Donc la luminosité d’un pixel est calculée avec pixel.to_luma(), cette fonction renvoie une valeur pondérée des composantes RGB.
+
+	•	La luminosité est ensuite utilisée pour décider si le pixel sera clair ou sombre, selon un seuil défini se seuil à été défini ici à >127.
+
+Question 8 : 
+
