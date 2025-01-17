@@ -25,3 +25,5 @@ L'image reste tout de même reconaissable même si les details ne sont plus du t
 
 
 Question 6 : 
+
+Afin de récupérer la luminisité d'un pixel, 
