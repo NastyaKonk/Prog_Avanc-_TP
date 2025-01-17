@@ -82,7 +82,7 @@ const MAGENTA: image::Rgb<u8> = image::Rgb([255, 0, 255]);
 const CYAN: image::Rgb<u8> = image::Rgb([0, 255, 255]); 
 
 fn default_number() -> usize {
-    7
+    8
 }
 
 fn default_noir() -> String {
