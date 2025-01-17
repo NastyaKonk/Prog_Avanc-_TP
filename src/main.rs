@@ -1,62 +1,174 @@
+use image::io::Reader as ImageReader;
+use image::ImageError;
+use image::Luma;
 use argh::FromArgs;
-use image::{open, RgbImage};
+use image::ImageBuffer;
+use image::{Rgb, RgbImage};
+use image::Pixel;
 
 #[derive(Debug, Clone, PartialEq, FromArgs)]
 /// Convertit une image en monochrome ou vers une palette réduite de couleurs.
 struct DitherArgs {
+
     /// le fichier d’entrée
     #[argh(positional)]
     input: String,
 
-    /// sous-commandes disponibles
+    /// le fichier de sortie (optionnel)
+    #[argh(positional)]
+    output: Option<String>,
+
+    /// le mode d’opération
     #[argh(subcommand)]
-    command: Command,
+    mode: Mode
 }
 
 #[derive(Debug, Clone, PartialEq, FromArgs)]
 #[argh(subcommand)]
-enum Command {
-    Luminosite(LuminositeArgs),  // La sous-commande Luminosite
+enum Mode {
+    Seuil(OptsSeuil),
+    Palette(OptsPalette),
 }
 
 #[derive(Debug, Clone, PartialEq, FromArgs)]
-/// Arguments pour afficher la luminosité d'un pixel
-struct LuminositeArgs {
-    /// coordonnées du pixel
-    #[argh(positional)]
-    x: u32,
-    #[argh(positional)]
-    y: u32,
+#[argh(subcommand, name="seuil")]
+/// Rendu de l’image par seuillage monochrome.
+struct OptsSeuil {
+
+    /// couleur pour les pixels sombres (choisir parmi: noir, blanc, rouge, vert, bleu, jaune, cyan, magenta)
+    #[argh(option, short = 'd', default = "default_noir()")]
+    dark_color: String,
+
+    /// couleur pour les pixels clairs (choisir parmi: noir, blanc, rouge, vert, bleu, jaune, cyan, magenta)
+    #[argh(option, short = 'l', default = "default_blanc()")]
+    light_color: String,
 }
 
-// Fonction pour calculer la luminosité d'un pixel RGB
-fn calculate_luminance(r: u8, g: u8, b: u8) -> f32 {
-    0.2126 * r as f32 + 0.7152 * g as f32 + 0.0722 * b as f32
+
+#[derive(Debug, Clone, PartialEq, FromArgs)]
+#[argh(subcommand, name="palette")]
+/// Rendu de l’image avec une palette contenant un nombre limité de couleurs
+struct OptsPalette {
+
+    /// le nombre de couleurs à utiliser, dans la liste [NOIR, BLANC, ROUGE, VERT, BLEU, JAUNE, CYAN, MAGENTA]
+    #[argh(option, default = "default_number()")]
+    n_couleurs: usize
+}
+ 
+const WHITE: image::Rgb<u8> = image::Rgb([255, 255, 255]);
+const GREY: image::Rgb<u8> = image::Rgb([127, 127, 127]);
+const BLACK: image::Rgb<u8> = image::Rgb([0, 0, 0]);
+const BLUE: image::Rgb<u8> = image::Rgb([0, 0, 255]);
+const RED: image::Rgb<u8> = image::Rgb([255, 0, 0]);
+const GREEN: image::Rgb<u8> = image::Rgb([0, 255, 0]);
+const YELLOW: image::Rgb<u8> = image::Rgb([255, 255, 0]);
+const MAGENTA: image::Rgb<u8> = image::Rgb([255, 0, 255]);
+const CYAN: image::Rgb<u8> = image::Rgb([0, 255, 255]); 
+
+fn default_number() -> usize {
+    7
 }
 
-fn main() {
-    // Extraire les arguments en utilisant argh
+fn default_noir() -> String {
+    "noir".to_string()
+}
+
+fn default_blanc() -> String {
+    "blanc".to_string()
+}
+
+fn parse_color(name: &str) -> Rgb<u8> {
+    match name {
+        "noir" => BLACK,
+        "blanc" => WHITE,
+        "rouge" => RED,
+        "vert" => GREEN,
+        "bleu" => BLUE,
+        "jaune" => YELLOW,
+        "cyan" => CYAN,
+        "magenta" => MAGENTA,
+        _ => panic!("Couleur invalide: {}", name),
+    }
+}
+
+fn find_closest_color(pixel: &Rgb<u8>, palette: &[Rgb<u8>]) -> Rgb<u8> {
+    let mut closest_color = palette[0];
+    let mut smallest_distance = f64::MAX;
+
+    for &color in palette {
+        let distance = color_distance(pixel, &color);
+        if distance < smallest_distance {
+            smallest_distance = distance;
+            closest_color = color;
+        }
+    }
+
+    closest_color
+}
+
+fn color_distance(c1: &Rgb<u8>, c2: &Rgb<u8>) -> f64 {
+    let dr = c1[0] as f64 - c2[0] as f64;
+    let dg = c1[1] as f64 - c2[1] as f64;
+    let db = c1[2] as f64 - c2[2] as f64;
+    (dr * dr + dg * dg + db * db).sqrt()
+}
+
+fn main() -> Result<(), ImageError>{
+
     let args: DitherArgs = argh::from_env();
+    let path_in = args.input;
+    let path_out = args.output.unwrap_or_else(|| "output.png".to_string());
+    
 
-    // Ouvrir l'image spécifiée dans les arguments
-    let img = open(&args.input)
-        .expect("Échec de l'ouverture de l'image")
-        .to_rgb8();
+    //1
+    let img_file = ImageReader::open(path_in)?;
+    let mut img = img_file.decode()?.into_rgb8();
+    /* println!("Le pixel en 32, 52 a pour couleur {:?}", img.get_pixel(32, 52));
+    for (x, y, color) in img.enumerate_pixels_mut(){
+        if (x+y) % 2  == 0{
+            *color = Rgb([255,255,255])
+        }
+    }
+    img.save("out1.png")?; */
+ 
+    match args.mode {
+        Mode::Seuil(opts) => {
+            for (_x, _y, pixel) in img.enumerate_pixels_mut() {
+                let dark_color = parse_color(&opts.dark_color);
+                let light_color = parse_color(&opts.light_color);
 
-    // Gestion de la sous-commande Luminosite
-    match args.command {
-        Command::Luminosite(lum_args) => {
-            // Vérifier si les coordonnées sont dans les limites de l'image
-            if lum_args.x < img.width() && lum_args.y < img.height() {
-                let pixel = img.get_pixel(lum_args.x, lum_args.y);
-                let luminance = calculate_luminance(pixel[0], pixel[1], pixel[2]);
-                println!(
-                    "La luminosité du pixel ({}, {}) est : {:.2}",
-                    lum_args.x, lum_args.y, luminance
-                );
-            } else {
-                println!("Les coordonnées ({}, {}) sont hors de l'image.", lum_args.x, lum_args.y);
+                let Luma(luminosity) = pixel.to_luma();
+                let new_pixel = if luminosity[0] > 127 {
+                    light_color
+                } else {
+                    dark_color
+                };
+                *pixel = new_pixel;
+            }
+        }
+        Mode::Palette(opts) => {
+            let palette = match opts.n_couleurs {
+                1 => vec![BLACK],
+                2 => vec![BLACK, WHITE],
+                3 => vec![BLACK, WHITE, RED],
+                4 => vec![BLACK, WHITE, RED, GREEN],
+                5 => vec![BLACK, WHITE, RED, GREEN, BLUE],
+                6 => vec![BLACK, WHITE, RED, GREEN, BLUE, YELLOW],
+                7 => vec![BLACK, WHITE, RED, GREEN, BLUE, YELLOW, CYAN],
+                8 => vec![BLACK, WHITE, RED, GREEN, BLUE, YELLOW, CYAN, MAGENTA],
+                _ => panic!("Nombre de couleurs invalide: {}", opts.n_couleurs),
+            };
+
+            for (_x, _y, pixel) in img.enumerate_pixels_mut() {
+                *pixel = find_closest_color(pixel, &palette);
             }
         }
     }
+
+    img.save(path_out)?;
+    return Ok(()) 
+   
+
+
 }
+
